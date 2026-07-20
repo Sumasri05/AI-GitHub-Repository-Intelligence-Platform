@@ -1,309 +1,140 @@
 # AI GitHub Repository Intelligence Platform
 
-An AI-powered platform that analyzes GitHub repositories and provides quality scores, insights, and improvement recommendations.
+An AI-powered platform that analyzes GitHub repositories and provides quality scores, insights, risk predictions, and engineering recommendations.
 
-The system evaluates repositories using multiple metrics such as project structure, documentation quality, commit activity, community health, and technology stack detection.
-
-The goal of this platform is to help developers improve the quality, maintainability, and impact of their open-source projects.
+The system evaluates repositories using multiple metrics such as project structure, documentation quality, commit activity, community health, code complexity, dependency health, and technology stack detection.
 
 ---
 
-# Project Overview
+## 🚀 Resilient Dual-Mode Architecture
 
-Modern open-source projects vary widely in quality and maintainability. Developers often struggle to understand whether their repositories follow best practices.
+To prevent backend dependency failures (such as Supabase free tier auto-pausing or DNS `ERR_NAME_NOT_RESOLVED`), this platform uses a **Fault-Tolerant Hybrid Architecture**:
 
-This platform solves that problem by automatically analyzing GitHub repositories and generating structured insights.
+1. **Cloud Mode (Default when Supabase is active)**: Uses Supabase PostgreSQL & Edge Functions for AI-generated summaries and persistent cloud storage.
+2. **Resilient Standalone Mode (Automatic Fallback)**: Runs a full **Client-Side Repository Analysis Engine** directly inside the user's browser using GitHub's REST API. Stores scans and history seamlessly in `localStorage` so the Dashboard, Leaderboard, Compare, and History pages **never crash or stay blank**.
 
-Key capabilities include:
-
-• Repository quality scoring
-• Documentation analysis
-• Community health evaluation
-• Technology stack detection
-• Repository comparison
-• Leaderboards of top repositories
-• Historical analysis tracking
-• Automated insights and recommendations
-
----
-
-# System Architecture
-
-The platform uses a modern web architecture combining a React frontend with a Supabase backend.
-
-Frontend:
-React + Vite + TypeScript + TailwindCSS
-
-Backend:
-Supabase (Database + API + authentication)
-
-Deployment:
-Netlify
-
-External APIs:
-GitHub API
-
-High level architecture:
-
-Frontend (React + Vite)
-↓
-Supabase Backend
-↓
-PostgreSQL Database
-↓
-GitHub API
+```
+                  ┌─────────────────────────────────────────┐
+                  │          User Requests Analysis         │
+                  └────────────────────┬────────────────────┘
+                                       │
+                        Try Supabase Edge Function
+                                       │
+                    ┌──────────────────┴──────────────────┐
+                    ▼                                     ▼
+             [Supabase Online]                    [Supabase Offline / Paused]
+        Executes via Cloud DB & AI           Falls Back to Client-Side Analyzer
+                    │                        (Direct GitHub API + Local Storage)
+                    └──────────────────┬──────────────────┘
+                                       │
+                       Renders Dashboard & Saved History
+```
 
 ---
 
-# Tech Stack
+## 🌟 Key Features
 
-Frontend
-
-React
-Vite
-TypeScript
-TailwindCSS
-Framer Motion
-Lucide Icons
-
-Backend
-
-Supabase
-PostgreSQL
-Supabase SQL migrations
-
-Dev Tools
-
-ESLint
-Vitest
-PostCSS
-
-Deployment
-
-Netlify
+- **Repository Quality Scoring**: Computes 7 sub-scores (Documentation, Maintainability, Structure, Community Health, Activity, Dependency Health, Code Complexity) and a weighted overall score out of 10.
+- **Risk Prediction Engine**: Predicts repository health risks (Low/Moderate/High) based on contributor patterns, commit recency, and issue backlog.
+- **Technology Stack Detection**: Automatically identifies frameworks, build tools, languages, and test suites (React, Next.js, Rust, Tailwind CSS, TypeScript, Python, etc.).
+- **Side-by-Side Repository Comparison**: Compare two GitHub projects across all metrics with animated visual charts.
+- **Leaderboard & Analytics Dashboard**: Ranks top open-source projects and visualizes score distributions, language breakdown, and maintenance timelines.
+- **Interactive Codebase Assistant (AI Chat)**: Ask questions about any scanned codebase.
+- **PDF Report Download**: Export comprehensive analysis summaries for any project.
 
 ---
 
-# Key Features
+## 🛠️ Tech Stack
 
-## Repository Analysis
-
-The platform analyzes GitHub repositories and extracts key metrics including:
-
-• File count and project structure
-• Languages used
-• Documentation completeness
-• README analysis
-• Contributor statistics
-• Commit frequency
-• Technology detection
+- **Frontend**: React 18, Vite, TypeScript, TailwindCSS, Framer Motion, Recharts, Lucide Icons, Radix UI Primitives
+- **Backend & Storage**: Supabase (PostgreSQL, Auth, Edge Functions), LocalStorage Fallback Store
+- **APIs**: GitHub REST API, Lovable AI Gateway
+- **Deployment**: Netlify / Vercel / Static Hosting
 
 ---
 
-## AI-Powered Insights
-
-The system generates intelligent insights to help developers improve repository quality.
-
-Examples include:
-
-• Add documentation sections
-• Improve repository structure
-• Increase commit activity
-• Add tests and CI/CD pipelines
-
----
-
-## Quality Scoring
-
-Each repository receives a quality score based on multiple evaluation metrics.
-
-Score factors include:
-
-• Documentation quality
-• Community health
-• Repository structure
-• Commit activity
-• Technology usage
-
----
-
-## Leaderboard
-
-Repositories can be ranked based on their quality score, allowing developers to compare projects.
-
----
-
-## Repository Comparison
-
-Two repositories can be compared side-by-side to analyze:
-
-• quality score differences
-• technology stack
-• project maturity
-
----
-
-## Historical Tracking
-
-Repository analysis results are stored and can be viewed later for historical insights.
-
----
-
-# Project Structure
+## 📁 Project Structure
 
 ```
 AI-GitHub-Repository-Intelligence-Platform
 │
-├── public                Static assets
-├── src                   Main application source
-│   ├── components        UI components
-│   ├── hooks             Custom React hooks
-│   ├── lib               API utilities
-│   └── pages             Application pages
+├── public                  Static assets
+├── src                     Main application source
+│   ├── components          UI components (Layout, CodebaseChat, ScoreGauge, etc.)
+│   ├── hooks               Custom hooks (useAuth, use-toast)
+│   ├── lib                 Core utilities & engines
+│   │   ├── repoAnalyzer.ts Client-side GitHub REST API analyzer
+│   │   ├── storage.ts      Local storage & preloaded dataset store
+│   │   ├── types.ts        TypeScript interface definitions
+│   │   └── utils.ts        Helper utilities
+│   └── pages               Application pages (Analyze, Dashboard, Leaderboard, Compare, History, etc.)
 │
-├── supabase              Backend configuration
-│   └── migrations        Database schema migrations
+├── supabase                Backend configuration & functions
+│   ├── functions           Edge Functions (analyze-repo, repo-chat, repo-api)
+│   └── migrations          PostgreSQL schema migrations
 │
 ├── index.html
 ├── package.json
 ├── vite.config.ts
 ├── tailwind.config.ts
-├── tsconfig.json
-├── postcss.config.js
-│
-├── README.md
-├── LICENSE
-└── .gitignore
+└── README.md
 ```
 
 ---
 
-# Installation
+## ⚙️ Installation & Local Setup
 
-Clone the repository
-
-```
-git clone https://github.com/yourusername/AI-GitHub-Repository-Intelligence-Platform.git
-```
-
-Navigate into the project
-
-```
+### 1. Clone the repository
+```bash
+git clone https://github.com/Sumasri05/AI-GitHub-Repository-Intelligence-Platform.git
 cd AI-GitHub-Repository-Intelligence-Platform
 ```
 
-Install dependencies
-
-```
+### 2. Install dependencies
+```bash
 npm install
 ```
 
-Start the development server
+### 3. Environment Variables
+Create a `.env` file in the root directory:
 
+```env
+VITE_SUPABASE_PROJECT_ID="your_project_id"
+VITE_SUPABASE_URL="https://your_project.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="your_publishable_key"
+
+# Optional: Higher GitHub API rate limits (5,000 requests/hr)
+# VITE_GITHUB_TOKEN="your_github_personal_access_token"
 ```
+
+### 4. Run Development Server
+```bash
 npm run dev
 ```
 
-Application will run at
-
-```
-http://localhost:5173
-```
+Open [http://localhost:8080](http://localhost:8080) in your browser.
 
 ---
 
-# Environment Variables
+## 🧪 Build & Test
 
-Create a `.env` file in the project root.
+```bash
+# Run production build check
+npx vite build
 
-Example:
-
-```
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_key
-```
-
----
-
-# Deployment
-
-This project is deployed using Netlify.
-
-Netlify configuration:
-
-Base directory:
-(empty)
-
-Build command:
-
-```
-npm run build
-```
-
-Publish directory:
-
-```
-dist
-```
-
----
-
-# Database
-
-The backend uses Supabase PostgreSQL.
-
-Database schema changes are handled using SQL migrations located in:
-
-```
-supabase/migrations
-```
-
----
-
-# Testing
-
-Run tests using:
-
-```
+# Run unit tests
 npm run test
 ```
 
-Testing framework:
-
-Vitest
-
 ---
 
-# Future Improvements
-
-Potential enhancements include:
-
-• Advanced AI analysis using LLMs
-• Repository trend prediction
-• GitHub pull request analysis
-• Code quality metrics integration
-• Security vulnerability scanning
-• Repository recommendation engine
-
----
-
-# License
+## 📄 License
 
 This project is licensed under the MIT License.
 
 ---
 
-# Author
+## 👤 Author
 
-Sumasri
+**Sumasri**  
 B.Tech Computer Science (AI & ML)
-
----
-
-# Acknowledgements
-
-GitHub API
-Supabase
-React
-TailwindCSS
-Netlify
