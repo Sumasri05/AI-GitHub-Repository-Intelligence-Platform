@@ -138,7 +138,7 @@ export default function Analyze() {
                       <span className="flex items-center gap-1"><Activity className="h-4 w-4" /> {r.commit_frequency}</span>
                     </div>
                     <div className="pt-2 flex gap-2 flex-wrap">
-                      <ReportDownload repoId={r.id} repoName={`${r.owner}-${r.repo_name}`} />
+                      <ReportDownload repoId={r.id} repoName={`${r.owner}-${r.repo_name}`} repo={r} />
                     </div>
                   </div>
                   <ScoreGauge score={r.score} label="Overall" size="lg" />
